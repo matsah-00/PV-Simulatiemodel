@@ -100,9 +100,9 @@ def build_pac_chart(df: pd.DataFrame, title: str):
 
 
 def main() -> None:
-    st.set_page_config(page_title="PV Sim V2", layout="wide")
+    st.set_page_config(page_title="PV Simulatiemodel", layout="wide")
 
-    st.title("PV Sim V2")
+    st.title("PV Simulatiemodel")
     st.write("Voer de parameters in en plot de PAC-opwek over een volledig jaar.")
 
     st.sidebar.header("Invoer")
