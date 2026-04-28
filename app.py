@@ -5,6 +5,7 @@ import sys
 
 import pandas as pd
 import plotly.express as px
+import requests
 import streamlit as st
 
 # Zorg dat de src-map importeerbaar is
@@ -26,6 +27,41 @@ def build_year_local_range(year: int) -> tuple[str, str]:
     start_local = f"{year}-01-01 00:00:00"
     end_local = f"{year}-12-31 23:59:59"
     return start_local, end_local
+
+
+@st.cache_data(show_spinner=False)
+def geocode_address_pdok(address: str) -> tuple[float, float, str]:
+    """
+    Zet adres om naar lat/lon + geeft het gevonden adres terug.
+    """
+    url = "https://api.pdok.nl/bzk/locatieserver/search/v3_1/free"
+    params = {
+        "q": address,
+        "rows": 1,
+    }
+
+    response = requests.get(url, params=params, timeout=10)
+    response.raise_for_status()
+
+    docs = response.json()["response"]["docs"]
+
+    if not docs:
+        raise ValueError(f"Locatie niet gevonden: {address}")
+
+    doc = docs[0]
+
+    # Coördinaten
+    point = doc["centroide_ll"]
+    lon, lat = map(
+        float,
+        point.replace("POINT(", "").replace(")", "").split(),
+    )
+
+    # Mooie naam van adres
+    # Dit veld werkt meestal goed:
+    display_name = doc.get("weergavenaam") or doc.get("adres") or "Onbekend adres"
+
+    return lat, lon, display_name
 
 
 @st.cache_data(show_spinner=False)
@@ -107,16 +143,12 @@ def main() -> None:
 
     st.sidebar.header("Invoer")
 
-    latitude = st.sidebar.number_input(
-        "Latitude",
-        value=52.0907,
-        format="%.6f",
+    location = st.sidebar.text_input(
+        "Adres of locatie",
+        value="Amsterdam",
+        placeholder="Bijv. Johan van Hasseltweg, Amsterdam",
     )
-    longitude = st.sidebar.number_input(
-        "Longitude",
-        value=5.1214,
-        format="%.6f",
-    )
+
     year = st.sidebar.number_input(
         "Jaar",
         min_value=1900,
@@ -165,8 +197,30 @@ def main() -> None:
     st.write(f"**Eind lokaal:** {end_local}")
 
     if not run_button:
-        st.info("Vul links je parameters in en klik op **Start simulatie**.")
+        st.info("Vul links je locatie en parameters in en klik op **Start simulatie**.")
         return
+
+    if not location.strip():
+        st.error("Vul een adres of locatie in.")
+        return
+
+    try:
+        with st.spinner("Locatie wordt omgezet naar coördinaten..."):
+            latitude, longitude, found_address = geocode_address_pdok(location.strip())
+    except Exception as exc:
+        st.error(f"Kon locatie niet omzetten naar coördinaten: {exc}")
+        return
+
+    st.markdown("### Gevonden locatie")
+
+    st.write(f"**Invoer:** {location}")
+    st.write(f"**Gevonden adres:** {found_address}")
+
+    if location.lower().strip() not in found_address.lower():
+        st.warning("Let op: het ingevoerde adres wijkt af van wat is gevonden.")
+
+    st.write(f"**Latitude:** {latitude:.6f}")
+    st.write(f"**Longitude:** {longitude:.6f}")
 
     try:
         with st.spinner("Simulatie wordt uitgevoerd..."):
