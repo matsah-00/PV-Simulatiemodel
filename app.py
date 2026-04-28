@@ -268,6 +268,25 @@ def main() -> None:
     except Exception as exc:
         st.error(f"Kon de grafiek niet opbouwen: {exc}")
 
+    st.markdown("## Download resultaten")
+
+    csv_10min = df_10min.to_csv(index=False).encode("utf-8")
+    csv_hourly = df_hourly.to_csv(index=False).encode("utf-8")
+
+    st.download_button(
+        label="Download 10-minuten data als CSV",
+        data=csv_10min,
+        file_name=f"pv_simulatie_10min_{year}.csv",
+        mime="text/csv",
+    )
+
+    st.download_button(
+        label="Download uurdata als CSV",
+        data=csv_hourly,
+        file_name=f"pv_simulatie_hourly_{year}.csv",
+        mime="text/csv",
+    )
+
 
 if __name__ == "__main__":
     main()

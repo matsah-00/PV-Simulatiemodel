@@ -5,9 +5,8 @@ Doel:
 - GHI splitsen in diffuse en directe component
 - GHI omzetten naar GTI/POA
 
-Keuze in v2:
+Model maakt gebruik van: 
 - Erbs-decompositie voor DHI / DNI
-- Isotrope hemel voor diffuse transpositie
 - Ground reflected component met albedo
 
 Terminologie:
@@ -38,7 +37,6 @@ def add_dhi_dni_erbs(df: pd.DataFrame) -> pd.DataFrame:
     - dni : directe normale instraling [W/m²]
 
     Opmerkingen:
-    - Deze implementatie is iets robuuster gemaakt voor 10-minuten data.
     - Bij zeer lage zonnestand wordt DNI op 0 gezet om onrealistische pieken te vermijden.
     - Als ghi ontbreekt, blijven kt/dhi/dni ook leeg (NaN).
     """

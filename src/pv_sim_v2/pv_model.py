@@ -6,7 +6,7 @@ Doel:
 - totale energie over de periode berekenen
 - 10-minuten data omzetten naar uurdata
 
-Volgens jouw model:
+Volgens model:
 PAC(t) = PSTC * (POA / 1000) * PR
 """
 

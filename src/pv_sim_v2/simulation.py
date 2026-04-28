@@ -2,9 +2,9 @@
 simulation.py
 
 Doel:
-- complete pipeline uitvoeren:
+- berekening uitvoeren:
     1. 3 dichtstbijzijnde KNMI stations zoeken
-    2. GHI/qg ophalen en interpoleren
+    2. GHI ophalen en interpoleren
     3. zonnepositie berekenen
     4. GHI -> DHI/DNI
     5. DHI/DNI -> GTI/POA

@@ -4,13 +4,8 @@ knmi_client.py
 Doel:
 - KNMI stations ophalen via de EDR API
 - dichtstbijzijnde stations bepalen op basis van coördinaten
-- qg ophalen voor een periode
 - GHI interpoleren op basis van de 3 dichtstbijzijnde stations
 
-Belangrijk:
-- We vragen de API in UTC aan
-- Voor de rest van het model werken we met lokale tijd (Europe/Amsterdam)
-- Daarna filteren we exact op de gewenste lokale periode
 """
 
 from __future__ import annotations
@@ -155,7 +150,7 @@ def local_period_to_utc_strings(
     timezone_name: str = "Europe/Amsterdam",
 ) -> Tuple[str, str]:
     """
-    Zet lokale tijdstrings om naar UTC ISO strings voor de KNMI API.
+    Zet lokale tijdstrings om naar UTC strings voor de KNMI API.
     """
     start_ts = pd.Timestamp(start_local).tz_localize(timezone_name)
     end_ts = pd.Timestamp(end_local).tz_localize(timezone_name)
@@ -179,8 +174,8 @@ def build_full_time_index(
     - 1h   : 2025-01-01 00:00 t/m 2025-12-31 23:00
 
     Output:
-    DataFrame met 1 kolom:
-    - time
+    - DataFrame met 1 kolom    
+    
     """
     start_ts = pd.Timestamp(start_local).tz_localize(timezone_name)
     end_ts = pd.Timestamp(end_local).tz_localize(timezone_name)
@@ -207,9 +202,6 @@ def ensure_full_10min_series(
     - Maak een volledige 10-minuten index voor de gevraagde periode
     - Merge de bestaande data daarop
     - Ontbrekende tijdstappen blijven aanwezig met NaN-waarden
-
-    Verwacht:
-    - kolom 'time' aanwezig
 
     Retourneert:
     - DataFrame met complete tijdas
